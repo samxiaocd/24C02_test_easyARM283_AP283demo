@@ -69,7 +69,7 @@ int main(int   argc,   char*   argv[])
 	sscanf(argv[2], "0x%x", &i2cDeviceAddress);
 	sscanf(argv[3], "%d", &iOffset);
 	iNum = argc - 4;
-	for (i = 1; i < DATA_LEN; i++) tx_buf[i] = 0;
+	for (i = 1; i < DATA_LEN; i++) tx_buf[i] = 33;
 	for (i = 0; i < iNum; i++)
 	{
 		sscanf(argv[4+i], "%d", &uiRet);   
@@ -78,32 +78,40 @@ int main(int   argc,   char*   argv[])
     	addr[0] = iOffset;
 	tx_buf[0] = addr[0];
 
-	printf("  %d => select  %s,  Device address(8 bit): 0x%X \n", i2cbusNo, I2CBUS_SELECTED, i2cDeviceAddress);
+	printf("  %d => select  %s\n", i2cbusNo, I2CBUS_SELECTED);
+	printf("    Device address(8 bit): 0x%X \n", i2cDeviceAddress);
+	printf("    reg offset: %d\n",tx_buf[0]);
+
     	GiFd = open(I2CBUS_SELECTED, O_RDWR);   
 	printf("  I2CBUS> open %s : 0x%X(%d). > %s \n",I2CBUS_SELECTED, GiFd, GiFd, GiFd < 0 ? "FAILURE" : "SUCCESS");
     	if(GiFd < 0) return -1;		
+
 
   	uiRet = ioctl(GiFd, I2C_SLAVE, i2cDeviceAddress >> 1);
 	printf("  I2CBUS> set slave address to 0x%02X: 0x%X(%d). > %s \n",i2cDeviceAddress,  uiRet, uiRet, uiRet < 0 ? "FAILURE" : "SUCCESS");
     	if (uiRet < 0) return -1;
 
+
   	uiRet = ioctl(GiFd, I2C_TENBIT, 0); // 8bit SLAVE ADDRESS
 	printf("  SZ.2>>set SLAVE ADDRESS is 8 bit : 0x%02x\n", uiRet);
 
-    	bytes = write(GiFd, tx_buf, DATA_LEN);
-	printf("  I2C write %d bytes : 0x%X(%d) bytes writed. > %s \n",DATA_LEN, bytes, bytes, bytes < 0 ? "FAILURE" : "SUCCESS");
+
+    	bytes = write(GiFd, tx_buf, iNum + 1);
+	printf("  I2C write %d bytes : 0x%X(%d) bytes writed. > %s \n",iNum, bytes, bytes, bytes < 0 ? "FAILURE" : "SUCCESS");
 	//usleep(100*1000); // delay 100ms !!!
     	usleep(10*1000);    // delay 10ms !!!
+
     	bytes = write(GiFd, addr, 1);
 	printf("  I2C write 1 bytes : 0x%X(%d) bytes writed. > %s \n", bytes, bytes, bytes < 0 ? "FAILURE" : "SUCCESS");
 	//usleep(100*1000); // delay 100ms
+
 	for(i=0; i<sizeof(rx_buf); i++) rx_buf[i] = 0;
-    	bytes = read(GiFd, rx_buf, iNum - 1);
+    	bytes = read(GiFd, rx_buf, iNum);
 	printf("  I2C read %d bytes: 0x%X(%d) bytes read back. > %s \n", iNum,  bytes, bytes, bytes < 0 ? "FAILURE" : "SUCCESS");
 
 	cntError = 0;
     	printf("  read from 24C02's eeprom(hex) from REG-%d: \n   ", iOffset);
-    	for(i = 0; i < iNum - 1; i++)
+    	for(i = 0; i < iNum; i++)
 	{
          	printf(" %x", rx_buf[i]);
 		if(rx_buf[i] != tx_buf[i+1]) cntError++;

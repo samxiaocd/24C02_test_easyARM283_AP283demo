@@ -95,7 +95,7 @@ int main(int   argc,   char*   argv[])
 	//usleep(100*1000); // delay 100ms
 	for(i=0; i<sizeof(rx_buf); i++) rx_buf[i] = 0;
     	bytes = read(GiFd, rx_buf, DATA_LEN - 1);
-	printf("  I2C read %d bytes: 0x%X(%d) bytes read back. > %s \n",DATA_LEN,  bytes, bytes, bytes < 0 ? "FAILURE" : "SUCCESS");
+	printf("  I2C read %d bytes: 0x%X(%d) bytes read back. > %s \n",DATA_LEN-1,  bytes, bytes, bytes < 0 ? "FAILURE" : "SUCCESS");
 
 	cntError = 0;
     	printf("  read from 24C02's eeprom(hex) 0x: \n   ");

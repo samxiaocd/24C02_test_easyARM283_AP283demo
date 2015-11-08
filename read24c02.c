@@ -88,11 +88,11 @@ int main(int   argc,   char*   argv[])
 	printf("  I2C write 1 bytes : 0x%X(%d) bytes writed. > %s \n", bytes, bytes, bytes < 0 ? "FAILURE" : "SUCCESS");
 	//usleep(100*1000); // delay 100ms
 	for(i=0; i<sizeof(rx_buf); i++) rx_buf[i] = 0;
-    	bytes = read(GiFd, rx_buf, iNum - 1);
+    	bytes = read(GiFd, rx_buf, iNum);
 	printf("  I2C read expect %d bytes :  %d bytes got . > %s \n",iNum, bytes, bytes < 0 ? "FAILURE" : "SUCCESS");
 
     	printf("  read from 24C02's eeprom(hex) from REG-%d:\n   ", iOffset);
-    	for(i = 0; i < iNum - 1; i++)
+    	for(i = 0; i < iNum; i++)
 	{
          	printf(" %x", rx_buf[i]);
     	}	
